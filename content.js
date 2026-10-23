@@ -3,16 +3,27 @@
 (function () {
   'use strict';
 
-  const { findBroSpots } = globalThis.Bro;
+  const { LEVELS, DEFAULT_LEVEL, findBroSpots } = globalThis.Bro;
 
-  // Never touch code, form controls, buttons, menus or anything the user can edit.
-  const SKIP_SELECTOR = [
+  // Never touch code, form controls or anything the user can edit.
+  const ALWAYS_SKIP = [
     'script', 'style', 'noscript', 'template', 'head', 'title',
-    'textarea', 'input', 'select', 'option', 'button', '[role="button"]',
-    'nav', 'menu', '[role="navigation"]', '[role="menu"]',
+    'textarea', 'input', 'select', 'option',
     'code', 'pre', 'kbd', 'samp', 'var', 'svg', 'math', 'canvas',
     '[contenteditable]:not([contenteditable="false"])',
-  ].join(',');
+  ];
+  // Buttons and menus are only fair game in hyper bro.
+  const UI_SKIP = [
+    'button', '[role="button"]', 'nav', 'menu', '[role="navigation"]', '[role="menu"]',
+  ];
+
+  let level = DEFAULT_LEVEL;
+  let skipSelector = '';
+
+  function setLevel(value) {
+    level = LEVELS.includes(value) ? value : DEFAULT_LEVEL;
+    skipSelector = (level === 'hyper' ? ALWAYS_SKIP : ALWAYS_SKIP.concat(UI_SKIP)).join(',');
+  }
 
   const INLINE = new Set([
     'A', 'ABBR', 'B', 'BDI', 'BDO', 'CITE', 'DATA', 'DEL', 'DFN', 'EM', 'FONT',
@@ -27,7 +38,7 @@
   }
 
   function isSkipped(el) {
-    return !el || el.closest(SKIP_SELECTOR) !== null || el.isContentEditable;
+    return !el || el.closest(skipSelector) !== null || el.isContentEditable;
   }
 
   function collectGroups(root) {
@@ -38,7 +49,7 @@
       {
         acceptNode(node) {
           if (node.nodeType === Node.TEXT_NODE) return NodeFilter.FILTER_ACCEPT;
-          return node.matches(SKIP_SELECTOR) || node.isContentEditable
+          return node.matches(skipSelector) || node.isContentEditable
             ? NodeFilter.FILTER_REJECT
             : NodeFilter.FILTER_SKIP;
         },
@@ -59,9 +70,7 @@
       text += n.data;
       return start;
     });
-    if (!text.includes('.')) return;
-
-    const spots = findBroSpots(text);
+    const spots = findBroSpots(text, level);
     // Back to front, so earlier offsets stay valid.
     for (let i = spots.length - 1; i >= 0; i--) {
       const { index, shout } = spots[i];
@@ -104,8 +113,28 @@
     observe();
   }
 
-  if (document.body) {
+  function start() {
+    if (!document.body) return;
+    observer.disconnect();
     broifyTree(document.body);
     observe();
+  }
+
+  // The level is set from the toolbar popup. Raising it re-scans the page;
+  // lowering it applies from the next page load.
+  const storage = globalThis.chrome && chrome.storage && chrome.storage.sync;
+  if (storage) {
+    storage.get({ level: DEFAULT_LEVEL }, (items) => {
+      setLevel(items && items.level);
+      start();
+    });
+    chrome.storage.onChanged.addListener((changes, area) => {
+      if (area !== 'sync' || !changes.level) return;
+      setLevel(changes.level.newValue);
+      start();
+    });
+  } else {
+    setLevel(DEFAULT_LEVEL);
+    start();
   }
 })();

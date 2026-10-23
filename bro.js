@@ -1,8 +1,15 @@
 // Sentence logic, kept free of the DOM so it can be tested in Node.
-// Given a run of text, findBroSpots returns the offsets of the full stops
-// that end a full sentence, i.e. where ", bro" should be inserted.
+// Given a run of text, findBroSpots returns the offsets where ", bro" should
+// be inserted. How much gets bro'd depends on the level:
+//   normal - full sentences ending in a full stop
+//   ultra  - full sentences ending in ".", "?" or "!"
+//   hyper  - everything: short sentences, "...", and text with no
+//            punctuation at all ("Sign in" -> "Sign in, bro")
 (function (root) {
   'use strict';
+
+  const LEVELS = ['normal', 'ultra', 'hyper'];
+  const DEFAULT_LEVEL = 'ultra';
 
   const MIN_WORDS = 3;
 
@@ -20,6 +27,8 @@
   const CONTINUES = /["'”’)\]]*\s+[\p{Ll}\p{N}]/uy;
   const OPENERS = /^[("'“‘[]+/;
   const CLOSERS = /["'”’)\]]+$/;
+  // Unpunctuated text that ends in a word, maybe inside quotes or brackets.
+  const ENDS_IN_WORD = /[\p{L}\p{N}]["'”’)\]]*$/u;
 
   function lastWordOf(sentence) {
     const words = sentence.trim().split(/\s+/);
@@ -40,7 +49,18 @@
     return !first || !/\p{Ll}/u.test(first[0]);
   }
 
-  function findBroSpots(text) {
+  function takesTerminator(terminator, level) {
+    if (level === 'hyper') return true;
+    if (level === 'ultra' && /^[!?]+$/.test(terminator)) return true;
+    return terminator === '.';
+  }
+
+  // ALL-CAPS SENTENCES GET AN ALL-CAPS BRO.
+  function isShouting(sentence) {
+    return /\p{Lu}/u.test(sentence) && !/\p{Ll}/u.test(sentence);
+  }
+
+  function findBroSpots(text, level = DEFAULT_LEVEL) {
     const spots = [];
     let start = 0;
     for (const m of text.matchAll(END)) {
@@ -52,22 +72,32 @@
       if (m[0] === '.' && isAbbreviation(lastWord)) continue;
 
       if (
-        m[0] === '.' &&
+        takesTerminator(m[0], level) &&
         /[\p{L}\p{N}]/u.test(lastWord) &&
         lastWord.toLowerCase() !== 'bro' && // the double-bro rule
-        isFullSentence(sentence)
+        (level === 'hyper' ? /\p{L}/u.test(sentence) : isFullSentence(sentence))
       ) {
-        // ALL-CAPS SENTENCES GET AN ALL-CAPS BRO.
-        const shout = /\p{Lu}/u.test(sentence) && !/\p{Ll}/u.test(sentence);
-        spots.push({ index: m.index, shout });
+        spots.push({ index: m.index, shout: isShouting(sentence) });
       }
       start = after;
+    }
+
+    // Hyper bro also gets the text with no punctuation: buttons, links, headings.
+    if (level === 'hyper') {
+      const tail = text.slice(start).trimEnd();
+      if (
+        ENDS_IN_WORD.test(tail) &&
+        /\p{L}/u.test(tail) &&
+        lastWordOf(tail).toLowerCase() !== 'bro'
+      ) {
+        spots.push({ index: start + tail.length, shout: isShouting(tail) });
+      }
     }
     return spots;
   }
 
-  function broify(text) {
-    const spots = findBroSpots(text);
+  function broify(text, level = DEFAULT_LEVEL) {
+    const spots = findBroSpots(text, level);
     for (let i = spots.length - 1; i >= 0; i--) {
       const { index, shout } = spots[i];
       text = text.slice(0, index) + (shout ? ', BRO' : ', bro') + text.slice(index);
@@ -75,7 +105,7 @@
     return text;
   }
 
-  const api = { findBroSpots, broify };
+  const api = { LEVELS, DEFAULT_LEVEL, findBroSpots, broify };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else root.Bro = api;
 })(typeof globalThis !== 'undefined' ? globalThis : this);

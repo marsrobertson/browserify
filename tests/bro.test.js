@@ -2,7 +2,8 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const { broify } = require('../bro.js');
 
-const cases = [
+// Normal bro: full sentences ending in a full stop.
+const normal = [
   // [input, expected]
   ['This is a sentence.', 'This is a sentence, bro.'],
   ['First one is here. Second one is here.', 'First one is here, bro. Second one is here, bro.'],
@@ -42,9 +43,53 @@ const cases = [
   ['One two three. Four five six.', 'One two three, bro. Four five six, bro.'],
 ];
 
-for (const [input, expected] of cases) {
-  test(JSON.stringify(input), () => {
-    assert.equal(broify(input), expected);
-    assert.equal(broify(broify(input)), expected);
-  });
+// Ultra bro: questions and exclamations too.
+const ultra = [
+  ['Is this a question? It is a statement.', 'Is this a question, bro? It is a statement, bro.'],
+  ['What a day it was!', 'What a day it was, bro!'],
+  ['Are you serious right now?!', 'Are you serious right now, bro?!'],
+  ['WHY IS IT SO LOUD?', 'WHY IS IT SO LOUD, BRO?'],
+  ['Are you okay, bro?', 'Are you okay, bro?'],
+  ['Do you even lift bro!', 'Do you even lift bro!'],
+  ['Why?', 'Why?'],
+  ['Sign in.', 'Sign in.'],
+  ['I was thinking about it...', 'I was thinking about it...'],
+  ['Dr. Smith went to the shop.', 'Dr. Smith went to the shop, bro.'],
+  ['Home', 'Home'],
+];
+
+// Super duper hyper cyber bro: everything.
+const hyper = [
+  ['Sign in.', 'Sign in, bro.'],
+  ['Why?', 'Why, bro?'],
+  ['Wow!', 'Wow, bro!'],
+  ['and many more things.', 'and many more things, bro.'],
+  ['I was thinking about it...', 'I was thinking about it, bro...'],
+  ['Sign in', 'Sign in, bro'],
+  ['Home', 'Home, bro'],
+  ['OK', 'OK, BRO'],
+  ['Settings (beta)', 'Settings (beta), bro'],
+  ['Read more  ', 'Read more, bro  '],
+  ['Welcome back. Log out', 'Welcome back, bro. Log out, bro'],
+  ['Hey bro', 'Hey bro'],
+  ['Email:', 'Email:'],
+  ['42', '42'],
+  ['', ''],
+  ['Dr. Smith', 'Dr. Smith, bro'],
+  ['We bought apples, pears, etc.', 'We bought apples, pears, etc.'],
+  ['You can find it at example.com.', 'You can find it at example.com.'],
+];
+
+const levels = { normal, ultra, hyper };
+for (const [level, cases] of Object.entries(levels)) {
+  for (const [input, expected] of cases) {
+    test(`${level}: ${JSON.stringify(input)}`, () => {
+      assert.equal(broify(input, level), expected);
+      assert.equal(broify(broify(input, level), level), expected);
+    });
+  }
 }
+
+test('default level is ultra', () => {
+  assert.equal(broify('What a day it was!'), 'What a day it was, bro!');
+});
