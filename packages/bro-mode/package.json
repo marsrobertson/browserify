@@ -1,0 +1,29 @@
+{
+  "name": "bro-mode",
+  "version": "1.0.0",
+  "description": "Ends every sentence with \", bro.\" Text, HTML, and Express/Connect middleware.",
+  "main": "index.js",
+  "files": [
+    "index.js",
+    "bro.js",
+    "html.js",
+    "middleware.js"
+  ],
+  "keywords": [
+    "bro",
+    "middleware",
+    "express",
+    "html",
+    "joke"
+  ],
+  "engines": {
+    "node": ">=20.19"
+  },
+  "scripts": {
+    "test": "node --test \"test/*.test.js\""
+  },
+  "dependencies": {
+    "entities": "^8.0.0",
+    "parse5": "^8.0.1"
+  }
+}

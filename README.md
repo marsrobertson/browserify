@@ -1,22 +1,46 @@
 # Bro
 
-A Chrome extension that ends every full sentence on every page you visit with ", bro."
+Ends every full sentence with ", bro." In your browser, on your server, or both.
 
 > Chrome extensions rewrite pages in place, bro.
 
-## Install
+| Folder | What it is |
+| --- | --- |
+| [`packages/bro-mode`](packages/bro-mode) | npm package: `npm install bro-mode`. Bro plain text, HTML, or every page an Express/Connect server sends. |
+| [`extensions/bro`](extensions/bro) | Chrome extension that bros every page you visit. |
+| [`extensions/unbro`](extensions/unbro) | Chrome extension that hides the bros a `bro-mode` server added. |
+
+## Install the extensions
 
 1. Download or clone this repo.
 2. Open `chrome://extensions`.
 3. Turn on **Developer mode** (top right).
-4. Click **Load unpacked** and pick this folder.
+4. Click **Load unpacked** and pick `extensions/bro` (or `extensions/unbro`).
 5. Reload any open tab.
 
 Works in any Chromium browser (Chrome, Edge, Brave, Arc).
 
+## Use it on a server
+
+```js
+const express = require('express');
+const bro = require('bro-mode');
+
+const app = express();
+app.use(bro()); // every HTML response, bro'd
+```
+
+More in [`packages/bro-mode/README.md`](packages/bro-mode/README.md).
+
+## Bro vs. Unbro
+
+Server bros come wrapped in `<span data-bro>`. Unbro hides exactly those, with one CSS rule, so it never touches a bro a human wrote. If a site runs `bro-mode` with `mark: false`, Unbro can't tell its bros apart, so it leaves them.
+
+The Bro extension never double-bros a server bro. If you run both extensions, Unbro wins on `bro-mode` sites and Bro wins everywhere else.
+
 ## Levels
 
-Click the Bro icon in the toolbar to pick one. The setting syncs across your Chrome profile.
+In the extension, click the Bro icon in the toolbar to pick one (the setting syncs across your Chrome profile). On the server, pass `{ level }`.
 
 | Level | What gets a bro | Example |
 | --- | --- | --- |
@@ -24,7 +48,7 @@ Click the Bro icon in the toolbar to pick one. The setting syncs across your Chr
 | **Ultra bro** (default) | Also full sentences ending in `?` or `!` | `Are you serious, bro?!` |
 | **Super duper hyper cyber bro** | Everything: short sentences, `...`, buttons, nav links, headings | `Sign in, bro` · `Home, bro` · `OK, BRO` |
 
-Turning the level up re-bros the open page straight away. Turning it down takes effect when you reload the tab.
+In the extension, turning the level up re-bros the open page straight away. Turning it down takes effect when you reload the tab.
 
 ## Rules
 
@@ -42,9 +66,12 @@ These are the Normal and Ultra rules. Super duper hyper cyber bro drops the word
 ## Development
 
 ```sh
+npm install
 npm test
 ```
 
-- `bro.js` holds the sentence rules for each level (no DOM, so it can be tested in Node).
-- `content.js` walks the page, joins up text split across tags like `<b>` and `<a>`, and inserts ", bro" in place.
-- `popup.html` / `popup.js` is the level picker. The level lives in `chrome.storage.sync`.
+- `packages/bro-mode/bro.js` holds the sentence rules for each level, plus which tags to skip. It's the single source of truth.
+- `extensions/bro/bro.js` is a copy, because Chrome loads an unpacked extension from its own folder. Run `npm run sync` after editing the original. A test fails if they drift.
+- `extensions/bro/content.js` walks the live page, joins up text split across tags like `<b>` and `<a>`, and inserts ", bro" in place.
+- `packages/bro-mode/html.js` does the same on the server with [parse5](https://github.com/inikulin/parse5), inserting into the original HTML so everything else comes out byte for byte as it went in.
+- `extensions/bro/popup.html` / `popup.js` is the level picker. The level lives in `chrome.storage.sync`.

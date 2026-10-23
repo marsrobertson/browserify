@@ -3,19 +3,13 @@
 (function () {
   'use strict';
 
-  const { LEVELS, DEFAULT_LEVEL, findBroSpots } = globalThis.Bro;
+  const {
+    LEVELS, DEFAULT_LEVEL, SKIP_TAGS, UI_TAGS, UI_ROLES, INLINE_TAGS, findBroSpots,
+  } = globalThis.Bro;
 
-  // Never touch code, form controls or anything the user can edit.
-  const ALWAYS_SKIP = [
-    'script', 'style', 'noscript', 'template', 'head', 'title',
-    'textarea', 'input', 'select', 'option',
-    'code', 'pre', 'kbd', 'samp', 'var', 'svg', 'math', 'canvas',
-    '[contenteditable]:not([contenteditable="false"])',
-  ];
-  // Buttons and menus are only fair game in hyper bro.
-  const UI_SKIP = [
-    'button', '[role="button"]', 'nav', 'menu', '[role="navigation"]', '[role="menu"]',
-  ];
+  const ALWAYS_SKIP = SKIP_TAGS.concat('[contenteditable]:not([contenteditable="false"])');
+  const UI_SKIP = UI_TAGS.concat(UI_ROLES.map((role) => `[role="${role}"]`));
+  const INLINE = new Set(INLINE_TAGS);
 
   let level = DEFAULT_LEVEL;
   let skipSelector = '';
@@ -25,15 +19,9 @@
     skipSelector = (level === 'hyper' ? ALWAYS_SKIP : ALWAYS_SKIP.concat(UI_SKIP)).join(',');
   }
 
-  const INLINE = new Set([
-    'A', 'ABBR', 'B', 'BDI', 'BDO', 'CITE', 'DATA', 'DEL', 'DFN', 'EM', 'FONT',
-    'I', 'INS', 'LABEL', 'MARK', 'Q', 'S', 'SMALL', 'SPAN', 'STRONG', 'SUB',
-    'SUP', 'TIME', 'U',
-  ]);
-
   function blockOf(node) {
     let el = node.nodeType === Node.ELEMENT_NODE ? node : node.parentElement;
-    while (el && INLINE.has(el.tagName) && el.parentElement) el = el.parentElement;
+    while (el && INLINE.has(el.localName) && el.parentElement) el = el.parentElement;
     return el;
   }
 

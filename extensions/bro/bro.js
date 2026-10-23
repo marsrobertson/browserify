@@ -11,6 +11,23 @@
   const LEVELS = ['normal', 'ultra', 'hyper'];
   const DEFAULT_LEVEL = 'ultra';
 
+  // Page structure, shared by the browser extension and the server.
+  // Never touch code, form controls or anything the user can edit.
+  const SKIP_TAGS = [
+    'script', 'style', 'noscript', 'template', 'head', 'title',
+    'textarea', 'input', 'select', 'option',
+    'code', 'pre', 'kbd', 'samp', 'var', 'svg', 'math', 'canvas',
+  ];
+  // Buttons and menus are only fair game in hyper bro.
+  const UI_TAGS = ['button', 'nav', 'menu'];
+  const UI_ROLES = ['button', 'navigation', 'menu'];
+  // Tags that sit inside a sentence, so "Hello <b>there</b>." is one sentence.
+  const INLINE_TAGS = [
+    'a', 'abbr', 'b', 'bdi', 'bdo', 'cite', 'data', 'del', 'dfn', 'em', 'font',
+    'i', 'ins', 'label', 'mark', 'q', 's', 'small', 'span', 'strong', 'sub',
+    'sup', 'time', 'u',
+  ];
+
   const MIN_WORDS = 3;
 
   // Words that end with a period without ending the sentence ("Dr. Smith").
@@ -105,7 +122,10 @@
     return text;
   }
 
-  const api = { LEVELS, DEFAULT_LEVEL, findBroSpots, broify };
+  const api = {
+    LEVELS, DEFAULT_LEVEL, SKIP_TAGS, UI_TAGS, UI_ROLES, INLINE_TAGS,
+    findBroSpots, broify,
+  };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else root.Bro = api;
 })(typeof globalThis !== 'undefined' ? globalThis : this);

@@ -1,0 +1,4 @@
+/* Hides the bros that bro-mode adds on the server. Human-written bros stay. */
+[data-bro] {
+  display: none !important;
+}

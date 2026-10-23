@@ -1,9 +1,13 @@
 {
-  "name": "bro-extension",
-  "version": "1.0.0",
+  "name": "browserify-bro",
+  "version": "1.1.0",
   "private": true,
-  "description": "Chrome extension that ends every full sentence with \", bro.\"",
+  "description": "Bro everywhere: the bro-mode npm package plus the Bro and Unbro Chrome extensions.",
+  "workspaces": [
+    "packages/*"
+  ],
   "scripts": {
-    "test": "node --test tests/*.test.js"
+    "sync": "node scripts/sync-extension.js",
+    "test": "npm test --workspaces && node --test \"tests/*.test.js\""
   }
 }
