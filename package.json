@@ -7,7 +7,7 @@
     "packages/*"
   ],
   "scripts": {
-    "sync": "node scripts/sync-extension.js",
+    "build": "node scripts/build.js",
     "test": "npm test --workspaces && node --test \"tests/*.test.js\""
   }
 }

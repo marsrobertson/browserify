@@ -1,12 +1,12 @@
 # Bro
 
-Ends every full sentence with ", bro." In your browser, on your server, or both.
+Ends every full sentence with ", bro." In your browser, on your server, or with one `<script>` tag on any website.
 
 > Chrome extensions rewrite pages in place, bro.
 
 | Folder | What it is |
 | --- | --- |
-| [`packages/bro-mode`](packages/bro-mode) | npm package: `npm install bro-mode`. Bro plain text, HTML, or every page an Express/Connect server sends. |
+| [`packages/bro-mode`](packages/bro-mode) | npm package: `npm install bro-mode`. Bro plain text, HTML, or every page an Express/Connect server sends. Also holds `browser.js`, the one-line drop-in for any website. |
 | [`extensions/bro`](extensions/bro) | Chrome extension that bros every page you visit. |
 | [`extensions/unbro`](extensions/unbro) | Chrome extension that strips the bros back out. |
 
@@ -19,6 +19,25 @@ Ends every full sentence with ", bro." In your browser, on your server, or both.
 5. Reload any open tab.
 
 Works in any Chromium browser (Chrome, Edge, Brave, Arc).
+
+## Add it to any website
+
+No build step, no npm. Put this just before `</body>`:
+
+```html
+<script src="https://cdn.jsdelivr.net/gh/marsrobertson/browserify@COMMIT/packages/bro-mode/browser.js" data-toggle></script>
+```
+
+Or download [`packages/bro-mode/browser.js`](packages/bro-mode/browser.js), put it next to your HTML, and use `src="browser.js"`. Self-hosting means no third party can change what runs on your site.
+
+| Attribute | |
+| --- | --- |
+| `data-toggle` | Adds an on/off switch in the top-right corner. Each visitor's choice is remembered. |
+| `data-level="hyper"` | `normal`, `ultra` (default) or `hyper`. |
+
+Turning bro off puts the page back exactly as it was, human-written bros included. It keeps bro'ing text the page adds later. The switch sits in its own shadow DOM, so your CSS can't break it, and it follows the visitor's light or dark mode.
+
+From your own code: `BroMode.on()`, `BroMode.off()`, `BroMode.toggle()`, `BroMode.setLevel('hyper')`.
 
 ## Use it on a server
 
@@ -50,7 +69,7 @@ In the extension, click the Bro icon in the toolbar to pick one (the setting syn
 | **Ultra bro** (default) | Also full sentences ending in `?` or `!` | `Are you serious, bro?!` |
 | **Super duper hyper cyber bro** | Everything: short sentences, `...`, buttons, nav links, headings | `Sign in, bro` · `Home, bro` · `OK, BRO` |
 
-In the extension, turning the level up re-bros the open page straight away. Turning it down takes effect when you reload the tab.
+In the extension, changing the level updates the open page straight away, up or down.
 
 ## Rules
 
@@ -73,7 +92,9 @@ npm test
 ```
 
 - `packages/bro-mode/bro.js` holds the sentence rules for each level, plus which tags to skip. It's the single source of truth.
-- `extensions/bro/bro.js` and `extensions/unbro/bro.js` are copies, because Chrome loads an unpacked extension from its own folder. Run `npm run sync` after editing the original. A test fails if they drift.
-- `extensions/bro/content.js` walks the live page, joins up text split across tags like `<b>` and `<a>`, and inserts ", bro" in place.
+- `packages/bro-mode/dom.js` bros a live page and remembers what it changed, so it can undo it. The Bro extension and `browser.js` both use it.
+- `packages/bro-mode/snippet.js` is the drop-in's setup: reads the `data-` attributes and draws the switch.
+- `packages/bro-mode/browser.js` and the `bro.js` / `dom.js` files in `extensions/` are generated copies, because the drop-in has to be one file and Chrome loads an unpacked extension from its own folder. Run `npm run build` after editing the originals. A test fails if they drift.
+- `extensions/bro/content.js` hooks `dom.js` up to the level picked in the popup.
 - `packages/bro-mode/html.js` does the same on the server with [parse5](https://github.com/inikulin/parse5), inserting into the original HTML so everything else comes out byte for byte as it went in.
 - `extensions/bro/popup.html` / `popup.js` is the level picker. The level lives in `chrome.storage.sync`.

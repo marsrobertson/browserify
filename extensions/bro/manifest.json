@@ -27,6 +27,7 @@
       ],
       "js": [
         "bro.js",
+        "dom.js",
         "content.js"
       ],
       "run_at": "document_idle",

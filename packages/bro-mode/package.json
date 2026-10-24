@@ -1,13 +1,17 @@
 {
   "name": "bro-mode",
   "version": "1.0.0",
-  "description": "Ends every sentence with \", bro.\" Text, HTML, and Express/Connect middleware.",
+  "description": "Ends every sentence with \", bro.\" Text, HTML, Express/Connect middleware, and a one-line <script> for any site.",
   "main": "index.js",
+  "unpkg": "browser.js",
+  "jsdelivr": "browser.js",
   "files": [
     "index.js",
     "bro.js",
     "html.js",
-    "middleware.js"
+    "middleware.js",
+    "dom.js",
+    "browser.js"
   ],
   "keywords": [
     "bro",

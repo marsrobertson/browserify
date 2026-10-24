@@ -8,6 +8,21 @@ npm install bro-mode
 
 Needs Node 20.19 or newer.
 
+## Any website, one line
+
+No build step needed. Put this just before `</body>`:
+
+```html
+<script src="https://cdn.jsdelivr.net/npm/bro-mode@1/browser.js" data-toggle></script>
+```
+
+Or copy `browser.js` from this package onto your own server and point `src` at it.
+
+- `data-toggle` adds an on/off switch in the top-right corner, and each visitor's choice is remembered.
+- `data-level="normal" | "ultra" | "hyper"` picks the level (default `ultra`).
+- Turning it off restores the page exactly as it was. Text the page adds later gets bro'd too.
+- From script: `BroMode.on()`, `BroMode.off()`, `BroMode.toggle()`, `BroMode.setLevel('hyper')`.
+
 ## Every page on your server
 
 ```js
