@@ -6,8 +6,10 @@ const path = require('path');
 const root = path.join(__dirname, '..');
 const read = (file) => fs.readFileSync(path.join(root, file), 'utf8');
 
-test('extension bro.js matches the package (run `npm run sync`)', () => {
-  assert.equal(read('extensions/bro/bro.js'), read('packages/bro-mode/bro.js'));
+test('extension bro.js copies match the package (run `npm run sync`)', () => {
+  for (const ext of ['bro', 'unbro']) {
+    assert.equal(read(`extensions/${ext}/bro.js`), read('packages/bro-mode/bro.js'), ext);
+  }
 });
 
 test('extension manifests are valid JSON and point at real files', () => {

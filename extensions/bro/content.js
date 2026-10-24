@@ -102,7 +102,8 @@
   }
 
   function start() {
-    if (!document.body) return;
+    // The Unbro extension is running here and wins.
+    if (!document.body || document.documentElement.hasAttribute('data-unbro')) return;
     observer.disconnect();
     broifyTree(document.body);
     observe();

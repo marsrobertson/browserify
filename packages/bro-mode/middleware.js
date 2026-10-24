@@ -17,7 +17,7 @@ function isBroable(req, res) {
   return !encoding || encoding === 'identity';
 }
 
-function middleware({ level = DEFAULT_LEVEL, mark = true } = {}) {
+function middleware({ level = DEFAULT_LEVEL } = {}) {
   if (!LEVELS.includes(level)) throw new Error(`Unknown bro level: ${level}`);
 
   return function bro(req, res, next) {
@@ -65,7 +65,7 @@ function middleware({ level = DEFAULT_LEVEL, mark = true } = {}) {
       if (typeof encoding === 'function') [encoding, cb] = [undefined, encoding];
       if (!decide()) return res.end(chunk, encoding, cb);
       if (chunk != null) chunks.push(Buffer.from(chunk, encoding));
-      const body = Buffer.from(broifyHTML(Buffer.concat(chunks).toString('utf8'), { level, mark }));
+      const body = Buffer.from(broifyHTML(Buffer.concat(chunks).toString('utf8'), { level }));
       res.setHeader('Content-Length', body.length);
       restore();
       return res.end(body, cb);

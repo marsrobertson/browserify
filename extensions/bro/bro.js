@@ -122,9 +122,17 @@
     return text;
   }
 
+  // The undo. Bros are plain text, so this can't tell one bro-mode added from
+  // one a person typed: every ", bro" that ends a sentence or a bit of text goes.
+  const UNBRO = /, (?:bro|BRO)(?=[.!?]|\s*$)/g;
+
+  function unbroify(text) {
+    return text.replace(UNBRO, '');
+  }
+
   const api = {
     LEVELS, DEFAULT_LEVEL, SKIP_TAGS, UI_TAGS, UI_ROLES, INLINE_TAGS,
-    findBroSpots, broify,
+    findBroSpots, broify, unbroify,
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else root.Bro = api;

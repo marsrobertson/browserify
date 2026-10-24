@@ -52,7 +52,7 @@ function rawOffset(raw, decodedIndex) {
   return decoded === decodedIndex ? raw.length : -1;
 }
 
-function broifyHTML(html, { level = DEFAULT_LEVEL, mark = true } = {}) {
+function broifyHTML(html, { level = DEFAULT_LEVEL } = {}) {
   if (!LEVELS.includes(level)) throw new Error(`Unknown bro level: ${level}`);
   const doc = parse(html, { sourceCodeLocationInfo: true });
   const inserts = [];
@@ -71,8 +71,7 @@ function broifyHTML(html, { level = DEFAULT_LEVEL, mark = true } = {}) {
       if (!loc) continue;
       const offset = rawOffset(html.slice(loc.startOffset, loc.endOffset), index - starts[k]);
       if (offset === -1) continue;
-      const bro = shout ? ', BRO' : ', bro';
-      inserts.push({ at: loc.startOffset + offset, bro: mark ? `<span data-bro>${bro}</span>` : bro });
+      inserts.push({ at: loc.startOffset + offset, bro: shout ? ', BRO' : ', bro' });
     }
   }
 

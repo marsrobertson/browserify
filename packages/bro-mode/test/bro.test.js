@@ -1,6 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { broify } = require('../bro.js');
+const { broify, unbroify } = require('../bro.js');
 
 // Normal bro: full sentences ending in a full stop.
 const normal = [
@@ -93,3 +93,29 @@ for (const [level, cases] of Object.entries(levels)) {
 test('default level is ultra', () => {
   assert.equal(broify('What a day it was!'), 'What a day it was, bro!');
 });
+
+// Unbro undoes bro-mode exactly, at every level, as long as the original
+// text had no bros of its own.
+for (const [level, cases] of Object.entries(levels)) {
+  for (const [input] of cases) {
+    if (/bro/i.test(input)) continue;
+    test(`unbro after ${level}: ${JSON.stringify(input)}`, () => {
+      assert.equal(unbroify(broify(input, level)), input);
+    });
+  }
+}
+
+const unbro = [
+  // It can't tell who wrote a bro, so human ones with a comma go too.
+  ['Thanks, bro.', 'Thanks.'],
+  ['Calm down, BRO!', 'Calm down!'],
+  // But not ones bro-mode would never have written.
+  ['Thanks bro.', 'Thanks bro.'],
+  ['Calm down, Bro.', 'Calm down, Bro.'],
+  ['Hey, brother.', 'Hey, brother.'],
+  ['Bro, listen to me.', 'Bro, listen to me.'],
+  ['Yo, bro, what is up?', 'Yo, bro, what is up?'],
+];
+for (const [input, expected] of unbro) {
+  test(`unbro: ${JSON.stringify(input)}`, () => assert.equal(unbroify(input), expected));
+}

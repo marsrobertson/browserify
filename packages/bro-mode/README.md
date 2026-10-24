@@ -27,13 +27,10 @@ Works with Connect, Express, or plain `node:http` as `(req, res, next)`.
 ## Options
 
 ```js
-app.use(bro({ level: 'hyper', mark: false }));
+app.use(bro({ level: 'hyper' }));
 ```
 
-| Option | Default | |
-| --- | --- | --- |
-| `level` | `'ultra'` | `'normal'`, `'ultra'` or `'hyper'`. See below. |
-| `mark` | `true` | Wrap each bro in `<span data-bro>`, so the Unbro extension (or your own CSS) can hide them. |
+`level` is `'normal'`, `'ultra'` (the default) or `'hyper'`:
 
 | Level | What gets a bro | Example |
 | --- | --- | --- |
@@ -46,7 +43,7 @@ At every level, `<script>`, `<style>`, `<pre>`, `<code>`, form fields, `<title>`
 ## Text and HTML
 
 ```js
-const { broify, broifyHTML } = require('bro-mode');
+const { broify, unbroify, broifyHTML } = require('bro-mode');
 
 broify('What a day it was!');
 // 'What a day it was, bro!'
@@ -55,10 +52,15 @@ broify('Sign in', 'hyper');
 // 'Sign in, bro'
 
 broifyHTML('<p>Hello <b>there</b> my friend.</p>');
-// '<p>Hello <b>there</b> my friend<span data-bro>, bro</span>.</p>'
+// '<p>Hello <b>there</b> my friend, bro.</p>'
+
+unbroify('Thanks, bro. Is it working, bro?');
+// 'Thanks. Is it working?'
 ```
 
-`broifyHTML` inserts into your original HTML rather than re-writing it, so everything except the bros comes out exactly as it went in.
+Bros are plain text: no wrapper elements, nothing for your CSS to catch on. `broifyHTML` inserts into your original HTML rather than re-writing it, so everything except the bros comes out exactly as it went in.
+
+`unbroify` undoes `broify` exactly, at any level. It can't tell who wrote a bro, though, so it strips human-written `, bro` endings too.
 
 ## Rules
 

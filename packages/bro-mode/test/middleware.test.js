@@ -22,7 +22,7 @@ async function serve(handler, options) {
   }
 }
 
-const B = '<span data-bro>, bro</span>';
+const B = ', bro';
 
 test('bros HTML and fixes Content-Length', async () => {
   const html = '<p>This is a sentence.</p>';
@@ -50,7 +50,7 @@ test('passes options through', async () => {
   const { body } = await serve((req, res) => {
     res.setHeader('Content-Type', 'text/html');
     res.end('<button>Sign in</button>');
-  }, { level: 'hyper', mark: false });
+  }, { level: 'hyper' });
   assert.equal(body, '<button>Sign in, bro</button>');
 });
 

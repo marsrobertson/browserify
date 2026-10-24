@@ -8,7 +8,7 @@ Ends every full sentence with ", bro." In your browser, on your server, or both.
 | --- | --- |
 | [`packages/bro-mode`](packages/bro-mode) | npm package: `npm install bro-mode`. Bro plain text, HTML, or every page an Express/Connect server sends. |
 | [`extensions/bro`](extensions/bro) | Chrome extension that bros every page you visit. |
-| [`extensions/unbro`](extensions/unbro) | Chrome extension that hides the bros a `bro-mode` server added. |
+| [`extensions/unbro`](extensions/unbro) | Chrome extension that strips the bros back out. |
 
 ## Install the extensions
 
@@ -34,9 +34,11 @@ More in [`packages/bro-mode/README.md`](packages/bro-mode/README.md).
 
 ## Bro vs. Unbro
 
-Server bros come wrapped in `<span data-bro>`. Unbro hides exactly those, with one CSS rule, so it never touches a bro a human wrote. If a site runs `bro-mode` with `mark: false`, Unbro can't tell its bros apart, so it leaves them.
+Server bros are bro native: plain text, no wrapper elements, so a site's CSS can't tell they're there. The flip side is that nobody can tell who wrote a bro, so Unbro strips every `, bro` that ends a sentence, human ones included. `Thanks, bro.` becomes `Thanks.` Bros without the comma (`Thanks bro.`) and capital-B ones (`Calm down, Bro.`) stay, because bro-mode never writes those.
 
-The Bro extension never double-bros a server bro. If you run both extensions, Unbro wins on `bro-mode` sites and Bro wins everywhere else.
+Unbro runs before the page paints and keeps stripping as the page changes. Like Bro, it leaves form fields, code and anything you can type into alone.
+
+The Bro extension never double-bros a server bro. If you run both extensions, Unbro wins everywhere: it flags the page and Bro stands down, so the two don't fight.
 
 ## Levels
 
@@ -71,7 +73,7 @@ npm test
 ```
 
 - `packages/bro-mode/bro.js` holds the sentence rules for each level, plus which tags to skip. It's the single source of truth.
-- `extensions/bro/bro.js` is a copy, because Chrome loads an unpacked extension from its own folder. Run `npm run sync` after editing the original. A test fails if they drift.
+- `extensions/bro/bro.js` and `extensions/unbro/bro.js` are copies, because Chrome loads an unpacked extension from its own folder. Run `npm run sync` after editing the original. A test fails if they drift.
 - `extensions/bro/content.js` walks the live page, joins up text split across tags like `<b>` and `<a>`, and inserts ", bro" in place.
 - `packages/bro-mode/html.js` does the same on the server with [parse5](https://github.com/inikulin/parse5), inserting into the original HTML so everything else comes out byte for byte as it went in.
 - `extensions/bro/popup.html` / `popup.js` is the level picker. The level lives in `chrome.storage.sync`.

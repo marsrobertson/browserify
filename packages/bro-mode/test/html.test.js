@@ -2,7 +2,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const { broifyHTML } = require('../html.js');
 
-const B = '<span data-bro>, bro</span>';
+const B = ', bro';
 
 const cases = [
   // [level, input, expected]
@@ -13,7 +13,7 @@ const cases = [
   ['normal', '<p>She said &quot;this is great.&quot;</p>', `<p>She said &quot;this is great${B}.&quot;</p>`],
   ['normal', '<p>Line one is\r\nhere now.</p>', `<p>Line one is\r\nhere now${B}.</p>`],
   ['normal', '<p>Is it good? Yes it is good.</p>', `<p>Is it good? Yes it is good${B}.</p>`],
-  ['normal', '<p>THIS IS VERY LOUD.</p>', '<p>THIS IS VERY LOUD<span data-bro>, BRO</span>.</p>'],
+  ['normal', '<p>THIS IS VERY LOUD.</p>', '<p>THIS IS VERY LOUD, BRO.</p>'],
   ['ultra', '<p>Is it any good?</p>', `<p>Is it any good${B}?</p>`],
 
   // Left alone, byte for byte
@@ -48,8 +48,8 @@ for (const [level, input, expected] of cases) {
   });
 }
 
-test('mark: false inserts plain text', () => {
-  assert.equal(broifyHTML('<p>This is a sentence.</p>', { mark: false }), '<p>This is a sentence, bro.</p>');
+test('adds plain text, no wrapper elements', () => {
+  assert.equal(broifyHTML('<p>This is a sentence.</p>'), '<p>This is a sentence, bro.</p>');
 });
 
 test('unknown level throws', () => {
