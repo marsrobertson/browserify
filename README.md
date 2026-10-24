@@ -25,7 +25,7 @@ Works in any Chromium browser (Chrome, Edge, Brave, Arc).
 No build step, no npm. Put this just before `</body>`:
 
 ```html
-<script src="https://cdn.jsdelivr.net/gh/marsrobertson/browserify@COMMIT/packages/bro-mode/browser.js" data-toggle></script>
+<script src="https://cdn.jsdelivr.net/gh/marsrobertson/browserify@42fe3f688b884a9c1a56299c3b67839956c114b8/packages/bro-mode/browser.js" data-toggle></script>
 ```
 
 Or download [`packages/bro-mode/browser.js`](packages/bro-mode/browser.js), put it next to your HTML, and use `src="browser.js"`. Self-hosting means no third party can change what runs on your site.
