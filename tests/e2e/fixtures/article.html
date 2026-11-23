@@ -1,0 +1,29 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Test article. With a full stop.</title></head>
+<body>
+<nav><ul><li id="nav-home"><a href="/">Home</a></li><li id="nav-about"><a href="/about">About this site here.</a></li></ul></nav>
+<h1 id="h1">A day at the beach</h1>
+<p id="plain">We went to the beach today. The water was cold.</p>
+<p id="split">It was <b>really</b> <a href="#">good</a> fun.</p>
+<p id="question">Was it worth the drive? What a day it was!</p>
+<p id="abbr">Dr. Smith met us at 3.50 on Jan. 5 this year.</p>
+<p id="short">Sign in.</p>
+<p id="human">Thanks, bro.</p>
+<button id="button">Subscribe to the newsletter now.</button>
+<pre id="pre">Code stays exactly the same.</pre>
+<p><code id="code">console.log("Not a sentence either.")</code></p>
+<input id="input" value="Typed text stays put.">
+<textarea id="textarea">Draft text stays put.</textarea>
+<div id="editable" contenteditable>You are writing an email here.</div>
+<iframe id="frame" src="/frame.html"></iframe>
+<p id="changing">The page will change this text.</p>
+<script>
+  setTimeout(() => {
+    const p = document.createElement('p');
+    p.id = 'later';
+    p.textContent = 'This paragraph was added later.';
+    document.body.append(p);
+    document.getElementById('changing').firstChild.data = 'The page changed this text.';
+  }, 400);
+</script>
+</body></html>

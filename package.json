@@ -8,6 +8,12 @@
   ],
   "scripts": {
     "build": "node scripts/build.js",
-    "test": "npm test --workspaces && node --test \"tests/*.test.js\""
+    "package": "node scripts/package.js",
+    "test": "npm test --workspaces && node --test \"tests/*.test.js\"",
+    "test:e2e": "node --test --test-concurrency=1 \"tests/e2e/*.e2e.js\"",
+    "store-assets": "node scripts/store-assets.js"
+  },
+  "devDependencies": {
+    "playwright": "1.63.0"
   }
 }

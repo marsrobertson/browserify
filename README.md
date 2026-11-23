@@ -88,8 +88,24 @@ These are the Normal and Ultra rules. Super duper hyper cyber bro drops the word
 
 ```sh
 npm install
-npm test
+npm test           # sentence rules, HTML, middleware: fast, no browser
+npm run test:e2e   # loads the real extensions into Chromium and checks real pages
 ```
+
+The first time you run `test:e2e`, install the browser with `npx playwright install chromium`. The browser tests cover the default level, the popup changing the level live (up and down), text added after the page loads, iframes, form fields and editors staying untouched, Unbro, and a 6,000-sentence page.
+
+## Publishing the Bro extension
+
+```sh
+npm run package       # -> dist/bro-<version>.zip, the file you upload
+npm run store-assets  # -> store/*.png, screenshots and promo tile
+```
+
+To test the exact zip you're about to upload, unzip it somewhere and run `BRO_EXTENSION_DIR=/path/to/unzipped npm run test:e2e`.
+
+[`store/LISTING.md`](store/LISTING.md) has the listing text, the privacy-tab answers and the permission justifications. [`store/PRIVACY.md`](store/PRIVACY.md) is the privacy policy the store asks for.
+
+Bump `version` in `extensions/bro/manifest.json` for every update you upload.
 
 - `packages/bro-mode/bro.js` holds the sentence rules for each level, plus which tags to skip. It's the single source of truth.
 - `packages/bro-mode/dom.js` bros a live page and remembers what it changed, so it can undo it. The Bro extension and `browser.js` both use it.
